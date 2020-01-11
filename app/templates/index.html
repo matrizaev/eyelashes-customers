@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container my-1 bg-light">
+	<div class="collapse"  id="collapsedForm">
+		<form method="POST" action="{{ url_for('main.AddCustomer') }}">
+			{{ add_form.csrf_token() }}
+			<div class="form-row">
+				<div class="form-group col-md-6">
+				  {{ add_form.first_name.label }}
+				  {{ add_form.first_name(class_ = 'form-control') }}
+				</div>
+				<div class="form-group col-md-6">
+				  {{ add_form.last_name.label }}
+				  {{ add_form.last_name(class_ = 'form-control') }}
+				</div>
+			</div>
+			<div class="form-row">
+				<div class="form-group col-md-6">
+					{{ add_form.phone.label }}
+					{{ add_form.phone(class_ = 'form-control') }}
+				</div>
+				<div class="form-group col-md-6">
+					{{ add_form.discount.label }}
+					{{ add_form.discount(class_ = 'form-control') }}
+				</div>
+			</div>
+			<div class="form-group">
+				{{ add_form.submit(class_ = 'btn btn-primary mb-1') }}
+			</div>
+		</form>
+	</div>
+</div>
+{% set customers = current_user.customers %}
+{% if customers|length > 0 %}
+<div class="container my-1 border bg-light">
+	<div class="row my-1">
+		<div class="col-sm">
+			<input class="form-control" id="customerFilter" type="text" placeholder="Фильтр..">
+		</div>
+		<div class="col-sm"> </div> 
+	</div>
+	<div class="row my-1 d-none d-sm-flex font-weight-bold">
+		<div class="col">
+			Имя
+		</div>
+		<div class="col">
+			Фамилия
+		</div>
+		<div class="col">
+			Телефон
+		</div>
+		<div class="col">
+			Скидка
+		</div>
+		<div class="col">
+			Посещений
+		</div>
+		<div class="col">
+			QR код
+		</div>	
+	</div>
+	{% for customer in customers %}
+	<form class="EditCustomerForm">
+		<div class="row my-1 border-bottom" id="{{ customer.guid }}">
+			<div class="col-sm">
+				{{ edit_form.csrf_token }}
+				{{ edit_form.guid(class_ = "d-none", value = customer.guid) }}
+				<input class="form-control-plaintext" name="first_name" required type="text" value="{{ customer.first_name }}">
+			</div>
+			<div class="col-sm">
+				<input class="form-control-plaintext" name="last_name" required type="text" value="{{ customer.last_name }}">
+			</div>
+			<div class="col-sm">
+				<span class="d-sm-none font-weight-bold">Телефон:</span>
+				<input class="form-control-plaintext" name="phone" required type="text" value="{{ customer.phone }}">
+			</div>
+			<div class="col-sm">
+				<span class="d-sm-none font-weight-bold">Скидка:</span>
+				<input class="form-control-plaintext" name="discount" required type="number" step="any" value="{{ customer.discount }}">
+			</div>
+			<div class="col-sm">
+				<span class="d-sm-none font-weight-bold">Посещений:</span>
+				<a href="#{{ customer.guid }}" class="d-none"></a>
+				<input class="form-control-plaintext" name="visit_count" required type="number" step="1" value="{{ customer.visit_count }}">
+			</div>
+			<div class="col-sm">
+				<a href="{{ url_for('main.ShowQRcode', guid=customer.guid) }}" class="thumbnail">
+					{{ customer.qr_code|safe }}
+				</a>
+			</div>
+		</div>
+	</form>
+	{% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+	function ShowAjaxFlashes(data){
+		var ajaxAlert = $('#ajaxAlert');
+		ajaxAlert.removeClass("d-none alert-primary alert-warning");
+		ajaxAlert.empty();
+		if (data.status == true)
+		{
+			ajaxAlert.addClass("alert-primary");
+		}
+		else
+		{
+			ajaxAlert.addClass("alert-warning");
+		}
+		data.flash.forEach(function(element) {
+			ajaxAlert.append(element + '<br>');
+		});
+	}
+
+	$(document).ready(function(){
+		var options = {
+			success:	ShowAjaxFlashes,
+			url: "{{ url_for('main.EditCustomer') }}",
+			dataType:	'json',
+			method: 'POST',
+			clearForm: false
+		};
+		$('.EditCustomerForm').ajaxForm(options);
+		$('.EditCustomerForm input').focus(function() {
+			$(this).removeClass('form-control-plaintext');
+			$(this).addClass ('form-control')
+		});
+		$('.EditCustomerForm input').focusout(function() {
+			$(this).closest('form').submit();
+			$(this).removeClass('form-control');
+			$(this).addClass ('form-control-plaintext')
+		});
+		if (document.location.hash)
+		{
+			var anchor = $(document.location.hash);
+			var row = anchor.closest('.row');
+			row.addClass('bg-info text-white');
+			var visit_count = row.find('input[name="visit_count"]');
+			var value = Number(visit_count.val()) + 1;
+			visit_count.val(value);
+			row.closest('form').submit();
+		}
+	});
+
+	$("#customerFilter").on("keyup", function() {
+		var value = $(this).val().toLowerCase();
+		$(".EditCustomerForm").filter(function() {
+			var form = $(this);
+			var result = false;
+			form.find('input').each(function(){
+				if ($(this).val().toLowerCase().indexOf(value) > -1)
+				{
+					result = true;
+					return false;
+				}
+			});
+			form.toggle(result);
+		});
+	});	
+	
+</script>
+{%endblock %}
