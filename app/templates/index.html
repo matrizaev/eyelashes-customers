@@ -169,19 +169,15 @@
 		$(".EditCustomerForm").filter(function() {
 			var form = $(this);
 			var result = false;
-			if (form.text().toLowerCase().indexOf(value) > -1)
-			{
-				result = true;
-			}
-			if (result == false){			
-				form.find('input').each(function(){
-					if ($(this).val().toLowerCase().indexOf(value) > -1)
-					{
-						result = true;
-						return false;
-					}
-				});
-			}
+
+			form.find('input').each(function(){
+				if ($(this).val().toLowerCase().indexOf(value) > -1)
+				{
+					result = true;
+					return false;
+				}
+			});
+
 			form.toggle(result);
 		});
 	});	
