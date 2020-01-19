@@ -1,4 +1,11 @@
 {% extends "base.html" %}
+
+{% block navigation %}
+	<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapsedForm" aria-expanded="false" aria-controls="collapsedForm">
+		Добавить клиентов
+	</button>
+{% endblock %}
+
 {% block content %}
 
 <div class="container my-1 bg-light">
@@ -6,23 +13,17 @@
 		<form method="POST" action="{{ url_for('main.AddCustomer') }}">
 			{{ add_form.csrf_token() }}
 			<div class="form-row">
-				<div class="form-group col-md-6">
-				  {{ add_form.first_name.label }}
-				  {{ add_form.first_name(class_ = 'form-control') }}
+				<div class="form-group col-md-4">
+					{{ add_form.count.label }}
+					{{ add_form.count(class_ = 'form-control') }}
 				</div>
-				<div class="form-group col-md-6">
-				  {{ add_form.last_name.label }}
-				  {{ add_form.last_name(class_ = 'form-control') }}
-				</div>
-			</div>
-			<div class="form-row">
-				<div class="form-group col-md-6">
-					{{ add_form.phone.label }}
-					{{ add_form.phone(class_ = 'form-control') }}
-				</div>
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-4">
 					{{ add_form.discount.label }}
 					{{ add_form.discount(class_ = 'form-control') }}
+				</div>
+				<div class="form-group col-md-4">
+					{{ add_form.visit_count.label }}
+					{{ add_form.visit_count(class_ = 'form-control') }}
 				</div>
 			</div>
 			<div class="form-group">
@@ -66,14 +67,14 @@
 			<div class="col-sm">
 				{{ edit_form.csrf_token }}
 				{{ edit_form.guid(class_ = "d-none", value = customer.guid) }}
-				<input class="form-control-plaintext" name="first_name" required type="text" value="{{ customer.first_name }}">
+				<input class="form-control-plaintext" name="first_name" required type="text" value="{{ customer.first_name if customer.first_name != None }}">
 			</div>
 			<div class="col-sm">
-				<input class="form-control-plaintext" name="last_name" required type="text" value="{{ customer.last_name }}">
+				<input class="form-control-plaintext" name="last_name" required type="text" value="{{ customer.last_name if customer.last_name != None }}">
 			</div>
 			<div class="col-sm">
 				<span class="d-sm-none font-weight-bold">Телефон:</span>
-				<input class="form-control-plaintext" name="phone" required type="text" value="{{ customer.phone }}">
+				<input class="form-control-plaintext" name="phone" required type="text" value="{{ customer.phone if customer.phone != None }}">
 			</div>
 			<div class="col-sm">
 				<span class="d-sm-none font-weight-bold">Скидка:</span>
@@ -131,9 +132,13 @@
 			$(this).addClass ('form-control')
 		});
 		$('.EditCustomerForm input').focusout(function() {
-			$(this).closest('form').submit();
+			var form = $(this).closest('form');
+			form.submit();
 			$(this).removeClass('form-control');
 			$(this).addClass ('form-control-plaintext')
+			var visit_count = form.find('input[name="visit_count"]');
+			if (Number(visit_count.val()) <= 0)
+				form.remove();
 		});
 		if (document.location.hash)
 		{

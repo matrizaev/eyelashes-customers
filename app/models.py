@@ -35,14 +35,14 @@ class User(UserMixin, db.Model):
 
 
 class Customer(db.Model):
-	first_name = db.Column(db.String(128), nullable=False)
-	last_name = db.Column(db.String(128), nullable=False)
+	first_name = db.Column(db.String(128), nullable=True)
+	last_name = db.Column(db.String(128), nullable=True)
 	phone = db.Column(db.String(128), nullable=True)
 	guid = db.Column(db.String(128), primary_key = True, default = str(uuid.uuid4()))
 	qr_code = db.Column(db.Text, nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-	discount = db.Column(db.Integer, nullable=False, default=0, server_default='0')
-	visit_count = db.Column(db.Integer, nullable=False, default = 0, server_default='0')
+	discount = db.Column(db.Integer, nullable=False, default=10, server_default='10')
+	visit_count = db.Column(db.Integer, nullable=False, default = 10, server_default='10')
 	
 	def GenerateQRcode(self):
 		img = qrcode.make(url_for('main.ShowIndex', _anchor=self.guid, _external=True), image_factory=qrcode.image.svg.SvgPathFillImage, box_size=10)

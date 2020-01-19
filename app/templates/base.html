@@ -38,11 +38,7 @@
 						<img src="http://84.201.148.50/static/logo.jpg" class="d-inline-block align-top thumbnail" alt="">
 						Студия Взгляда
 					</a>
-					{% if current_user.is_authenticated %}
-					<button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapsedForm" aria-expanded="false" aria-controls="collapsedForm">
-						Добавить клиента
-					</button>
-					{% endif %}
+					{% block navigation %}{% endblock %}
 			</div>
 				</nav>				
 			</div>
