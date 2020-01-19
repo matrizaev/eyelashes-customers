@@ -40,7 +40,7 @@ class Customer(db.Model):
 	phone = db.Column(db.String(128), nullable=True)
 	guid = db.Column(db.String(128), primary_key = True, default = str(uuid.uuid4()))
 	qr_code = db.Column(db.Text, nullable=False)
-	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	discount = db.Column(db.Integer, nullable=False, default=10, server_default='10')
 	visit_count = db.Column(db.Integer, nullable=False, default = 10, server_default='10')
 	

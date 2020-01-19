@@ -83,7 +83,7 @@
 			<div class="col-sm">
 				<span class="d-sm-none font-weight-bold">Посещений:</span>
 				<a href="#{{ customer.guid }}" class="d-none"></a>
-				<input class="form-control-plaintext" name="visit_count" required type="number" step="1" value="{{ customer.visit_count }}">
+				<input class="form-control-plaintext" name="visit_count" required type="number" step="1" min="0" value="{{ customer.visit_count }}">
 			</div>
 			<div class="col-sm">
 				<a href="{{ url_for('main.ShowQRcode', guid=customer.guid) }}" class="thumbnail">

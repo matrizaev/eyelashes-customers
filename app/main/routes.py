@@ -21,7 +21,7 @@ def ShowQRcode(guid):
 	if customer:
 		return Response (customer.qr_code, mimetype='image/svg+xml', headers = {'Content-Disposition':'attachment;filename={}.svg'.format(guid)})
 	else:
-		flash('Клиент не найден')
+		flash('Клиент не найден.')
 		return redirect(url_for('main.ShowIndex'), code = 302)
 	
 @bp.route('/add', methods=['POST'])
@@ -30,12 +30,13 @@ def AddCustomer():
 	form = AddCustomerForm(request.form)
 	if form.validate_on_submit():
 		for i in range(form.count.data):
-			customer = Customer(guid = str(uuid.uuid4()), discount = form.discount.data, visit_count = form.visit_count.data)
+			visit_count = form.visit_count.data if form.visit_count.data > 0 else 1
+			customer = Customer(guid = str(uuid.uuid4()), discount = form.discount.data, visit_count = visit_count)
 			customer.GenerateQRcode()
 			current_user.customers.append(customer)
 			db.session.add(customer)
 		db.session.commit()
-		flash('Клиенты успешно добавлен')
+		flash('Клиенты успешно добавлены.')
 	else:
 		for error in form.count.errors + form.discount.errors:
 			flash(error)
@@ -50,7 +51,7 @@ def EditCustomer():
 	if form.validate_on_submit():
 		customer = Customer.query.filter(Customer.guid == form.guid.data, Customer.user_id == current_user.id).first()
 		if customer:
-			if form.visit_count.data == 0:
+			if form.visit_count.data <= 0:
 				db.session.delete(customer)
 				flashMessages.append('Клиент удалён, посещения истекли.')
 			else:
@@ -59,7 +60,7 @@ def EditCustomer():
 				customer.phone = form.phone.data
 				customer.discount = form.discount.data
 				customer.visit_count = form.visit_count.data
-				flashMessages.append('Клиент успешно изменён')
+				flashMessages.append('Клиент успешно изменён.')
 			db.session.commit()
 			status = True
 		else:
@@ -68,6 +69,6 @@ def EditCustomer():
 		for error in form.first_name.errors + form.last_name.errors + form.phone.errors + form.discount.errors + form.guid.errors + form.visit_count.errors:
 			flashMessages.append(error)
 	if not status and len(flashMessages) == 0:
-		flashMessages.append('Не удалось внести изменения')
+		flashMessages.append('Не удалось внести изменения.')
 	return jsonify({'status':status, 'flash':flashMessages})
 	
