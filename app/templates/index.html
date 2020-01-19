@@ -58,6 +58,9 @@
 			Посещений
 		</div>
 		<div class="col">
+			Добавлен
+		</div>
+		<div class="col">
 			QR код
 		</div>	
 	</div>
@@ -67,10 +70,10 @@
 			<div class="col-sm">
 				{{ edit_form.csrf_token }}
 				{{ edit_form.guid(class_ = "d-none", value = customer.guid) }}
-				<input class="form-control-plaintext" name="first_name" required type="text" value="{{ customer.first_name if customer.first_name != None }}">
+				<input placeholder="Имя" class="form-control-plaintext" name="first_name" required type="text" value="{{ customer.first_name if customer.first_name != None }}">
 			</div>
 			<div class="col-sm">
-				<input class="form-control-plaintext" name="last_name" required type="text" value="{{ customer.last_name if customer.last_name != None }}">
+				<input placeholder="Фамилия" class="form-control-plaintext" name="last_name" required type="text" value="{{ customer.last_name if customer.last_name != None }}">
 			</div>
 			<div class="col-sm">
 				<span class="d-sm-none font-weight-bold">Телефон:</span>
@@ -84,6 +87,9 @@
 				<span class="d-sm-none font-weight-bold">Посещений:</span>
 				<a href="#{{ customer.guid }}" class="d-none"></a>
 				<input class="form-control-plaintext" name="visit_count" required type="number" step="1" min="0" value="{{ customer.visit_count }}">
+			</div>
+			<div class="col-sm">
+				{{ moment(customer.timestamp).format('LLL') }}
 			</div>
 			<div class="col-sm">
 				<a href="{{ url_for('main.ShowQRcode', guid=customer.guid) }}" class="thumbnail">
@@ -102,16 +108,17 @@
 <script>
 
 	function ShowAjaxFlashes(data){
+		$('.alert').empty();
+		$('.alert').addClass('d-none');
 		var ajaxAlert = $('#ajaxAlert');
-		ajaxAlert.removeClass("d-none alert-primary alert-warning");
-		ajaxAlert.empty();
+		ajaxAlert.removeClass('d-none alert-primary alert-warning');
 		if (data.status == true)
 		{
-			ajaxAlert.addClass("alert-primary");
+			ajaxAlert.addClass('alert-primary');
 		}
 		else
 		{
-			ajaxAlert.addClass("alert-warning");
+			ajaxAlert.addClass('alert-warning');
 		}
 		data.flash.forEach(function(element) {
 			ajaxAlert.append(element + '<br>');
@@ -144,9 +151,14 @@
 		{
 			var anchor = $(document.location.hash);
 			var row = anchor.closest('.row');
-			row.addClass('bg-info text-white');
 			var visit_count = row.find('input[name="visit_count"]');
-			var value = Number(visit_count.val()) + 1;
+			var value = Number(visit_count.val()) - 1;
+			if (value <= 0){
+				value = 0;
+				row.addClass('bg-danger text-white');
+			} else {
+				row.addClass('bg-info text-white');
+			}
 			visit_count.val(value);
 			row.closest('form').submit();
 		}
@@ -157,13 +169,19 @@
 		$(".EditCustomerForm").filter(function() {
 			var form = $(this);
 			var result = false;
-			form.find('input').each(function(){
-				if ($(this).val().toLowerCase().indexOf(value) > -1)
-				{
-					result = true;
-					return false;
-				}
-			});
+			if (form.text().toLowerCase().indexOf(value) > -1)
+			{
+				result = true;
+			}
+			if (result == false){			
+				form.find('input').each(function(){
+					if ($(this).val().toLowerCase().indexOf(value) > -1)
+					{
+						result = true;
+						return false;
+					}
+				});
+			}
 			form.toggle(result);
 		});
 	});	

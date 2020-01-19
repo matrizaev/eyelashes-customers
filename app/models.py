@@ -9,6 +9,7 @@ import qrcode.image.svg
 from xml.etree.ElementTree import tostring
 from flask import url_for
 import io
+from datetime import datetime
 
 @login.user_loader
 def load_user(id):
@@ -43,6 +44,7 @@ class Customer(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	discount = db.Column(db.Integer, nullable=False, default=10, server_default='10')
 	visit_count = db.Column(db.Integer, nullable=False, default = 10, server_default='10')
+	timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 	
 	def GenerateQRcode(self):
 		img = qrcode.make(url_for('main.ShowIndex', _anchor=self.guid, _external=True), image_factory=qrcode.image.svg.SvgPathFillImage, box_size=10)

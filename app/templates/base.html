@@ -11,9 +11,10 @@
 				.thumbnail,svg{width:30px;height:30px;}
 			</style>
 		{% endblock %}
-		<script src="//code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 		<title>Студия Взгляда</title>
-		
+		{{ moment.include_jquery() }}
+		{{ moment.include_moment(sri=False) }}
+		{{ moment.locale("ru") }}
 	</head>
 	<body>
 		<header id="header" class="header">
