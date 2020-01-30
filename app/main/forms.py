@@ -5,7 +5,6 @@ from wtforms.validators import DataRequired, ValidationError, InputRequired, Num
 class AddCustomerForm(FlaskForm):
 	count = IntegerField('Количество', render_kw={'type': 'number', 'step':'any', 'value':10, 'min':1}, validators = [DataRequired(message='Количество - обязательное поле.'), NumberRange(min=1, message='Невозможно добавить меньше одного клиента.')])
 	discount = IntegerField('Скидка', render_kw={'type': 'number', 'step':'any', 'value':10}, validators = [InputRequired(message='Скидка - обязательное поле.')])
-	visit_count = IntegerField('Посещений', render_kw={'type': 'number', 'step':'any', 'value':10, 'min':1}, validators = [DataRequired(message='Счётчик посещений - обязательное поле.'), NumberRange(min=1, message='Должно быть хотя бы одно посещение.')])
 	submit = SubmitField('Сохранить')
 
 class EditCustomerForm(FlaskForm):

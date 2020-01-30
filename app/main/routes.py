@@ -30,8 +30,7 @@ def AddCustomer():
 	form = AddCustomerForm(request.form)
 	if form.validate_on_submit():
 		for i in range(form.count.data):
-			visit_count = form.visit_count.data if form.visit_count.data > 0 else 1
-			customer = Customer(guid = str(uuid.uuid4()), discount = form.discount.data, visit_count = visit_count)
+			customer = Customer(guid = str(uuid.uuid4()), discount = form.discount.data)
 			customer.GenerateQRcode()
 			current_user.customers.append(customer)
 			db.session.add(customer)
@@ -52,15 +51,16 @@ def EditCustomer():
 		customer = Customer.query.filter(Customer.guid == form.guid.data, Customer.user_id == current_user.id).first()
 		if customer:
 			if form.visit_count.data <= 0:
-				db.session.delete(customer)
-				flashMessages.append('Клиент удалён, посещения истекли.')
+				customer.visit_count = 10
+				flashMessages.append('Счётчик посещений сброшен.')
 			else:
-				customer.first_name = form.first_name.data
-				customer.last_name = form.last_name.data
-				customer.phone = form.phone.data
-				customer.discount = form.discount.data
 				customer.visit_count = form.visit_count.data
-				flashMessages.append('Клиент успешно изменён.')
+			customer.first_name = form.first_name.data
+			customer.last_name = form.last_name.data
+			customer.phone = form.phone.data
+			customer.discount = form.discount.data
+			customer.visit_count = form.visit_count.data
+			flashMessages.append('Клиент успешно изменён.')
 			db.session.commit()
 			status = True
 		else:
